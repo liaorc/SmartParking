@@ -89,6 +89,9 @@ public class MainFragment extends Fragment {
         mSearchView = (ViewGroup)v.findViewById(R.id.search_layout);
         mSearchView.setVisibility(View.GONE);
 
+        mSearchLocationEditText = (EditText)v.findViewById(R.id.search_locationEditText);
+        mSearchLocationButton = (Button)v.findViewById(R.id.search_locationButton);
+
         return v;
     }
     private void setLocationOption() {
@@ -96,7 +99,7 @@ public class MainFragment extends Fragment {
         option.setOpenGps(true); // 打开GPS
         option.setLocationMode(LocationClientOption.LocationMode.Hight_Accuracy);// 设置定位模式
         option.setCoorType("bd09ll"); // 返回的定位结果是百度经纬度,默认值gcj02
-        option.setScanSpan(1000); // 设置发起定位请求的间隔时间为5000ms
+        option.setScanSpan(1000); // 设置发起定位请求的间隔时间为1000ms
         option.setIsNeedAddress(true); // 返回的定位结果包含地址信息
         option.setNeedDeviceDirect(true); // 返回的定位结果包含手机机头的方向
 
