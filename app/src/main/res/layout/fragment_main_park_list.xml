@@ -8,34 +8,70 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="30"
+        android:layout_weight="40"
         android:visibility="invisible"></View>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="40"
+        android:layout_weight="30"
         android:orientation="vertical"
         >
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:background="@color/actionbar_background"
             >
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:paddingLeft="4dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingRight="4dp"
+                android:src="@drawable/location_icon161x240_gai"
+                />
             <TextView
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="真是蛋疼啊"
+                android:text="目的地："
+                android:paddingRight="4dp"/>
+            <TextView
+                android:id="@+id/search_locationEditText"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:layout_marginLeft="4dp"
+                android:gravity="center_vertical"
+                android:singleLine="true"
+                android:text="上海交通大学南门"
                 />
 
+            <Button
+                android:id="@+id/search_locationButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="停车"
+                android:background="@drawable/stroke_box"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_marginLeft="-1dp"
+
+                />
         </LinearLayout>
-        <TextView
+        <ListView
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
-            android:text="是蛋疼啊"
             android:background="@color/main_background_apparent"
-            />
+            android:id="@+id/park_list"
+            ></ListView>
 
     </LinearLayout>
 

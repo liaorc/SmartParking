@@ -12,10 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
@@ -71,6 +73,8 @@ public class MainFragment extends Fragment {
     private Button mSearchLocationButton;
     private String mCity;
     private LatLng mDestination;
+
+    private ListView mParkList;
 
 
     @Override
@@ -171,6 +175,14 @@ public class MainFragment extends Fragment {
                 }
             }
         });
+
+        final String[] strs = new String[] {
+                "first", "second", "third", "fourth", "fifth"
+        };
+
+        mParkList = (ListView)v.findViewById(R.id.park_list);
+        mParkList.setAdapter(new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_1, strs));
 
         return v;
     }
