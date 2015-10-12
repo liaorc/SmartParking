@@ -15,6 +15,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
@@ -27,13 +29,23 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeOption;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.MySSLSocketFactory;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Ruochen on 2015/10/12.
  */
 public class MainFragment extends Fragment {
-    private static final String TAG = "main_activity";
+    private static final String TAG = "main_fragment";
     // 百度地图控件
     private MapView mMapView = null;
     // 百度地图对象
@@ -49,6 +61,7 @@ public class MainFragment extends Fragment {
     private ViewGroup mMenuView;
     private ViewGroup mSearchView;
     private MenuItem mMenuButton;
+    private ImageButton mParkNowButton;
     private Animation mHide;
 
     private float mY1, mY2;
@@ -57,6 +70,7 @@ public class MainFragment extends Fragment {
     private EditText mSearchLocationEditText;
     private Button mSearchLocationButton;
     private String mCity;
+    private LatLng mDestination;
 
 
     @Override
@@ -92,6 +106,72 @@ public class MainFragment extends Fragment {
         mSearchLocationEditText = (EditText)v.findViewById(R.id.search_locationEditText);
         mSearchLocationButton = (Button)v.findViewById(R.id.search_locationButton);
 
+
+        mSearch = GeoCoder.newInstance();
+        OnGetGeoCoderResultListener listener = new OnGetGeoCoderResultListener() {
+            public void onGetGeoCodeResult(GeoCodeResult result) {
+                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+                    //没有检索到结果
+                    if(result.error == SearchResult.ERRORNO.PERMISSION_UNFINISHED) {
+                        mSearch.geocode(new GeoCodeOption()
+                                .city("上海")
+                                .address("东川路800号"));
+                    }
+                    Log.d(TAG, "没有结果");
+                    Log.d(TAG, "error code: " + result.error);
+                    return;
+                }
+                //获取地理编码结果
+                mDestination = result.getLocation();
+                //addMarker(result.getLocation().latitude, result.getLocation().longitude);
+
+            }
+
+            @Override
+            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+                    //没有找到检索结果
+                }
+                //获取反向地理编码结果
+            }
+        };
+        mSearch.setOnGetGeoCodeResultListener(listener);
+        mSearch.geocode(new GeoCodeOption()
+                .city("上海市")
+                .address("上海市闵行区东川路800号"));
+
+        mParkNowButton = (ImageButton)v.findViewById(R.id.menu_park_nowButton);
+        mParkNowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "日狗日狗日", Toast.LENGTH_SHORT).show();
+
+                try {
+                    ServerRequest serverRequest = new ServerRequest();
+                    serverRequest.setString(JSONLabel.SESSION,
+                            CurrentUser.get(getActivity()).getSession());
+                    serverRequest.setDouble(JSONLabel.RADIUS, 2000);
+                    serverRequest.setDouble(JSONLabel.DEST_LNG, mDestination.longitude);
+                    serverRequest.setDouble(JSONLabel.DEST_LAT, mDestination.latitude);
+                    AsyncHttpClient client = new AsyncHttpClient();
+                    client.setSSLSocketFactory(MySSLSocketFactory.getFixedSocketFactory());
+                    client.get(serverRequest.queryParks(), new AsyncHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                            Log.d(TAG, "parks: "+ new String(responseBody));
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         return v;
     }
     private void setLocationOption() {
@@ -105,6 +185,7 @@ public class MainFragment extends Fragment {
 
         mLocationClient.setLocOption(option);
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

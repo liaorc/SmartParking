@@ -75,12 +75,7 @@
 
                 />
         </LinearLayout>
-
-
-
-
-
-
     </LinearLayout>
 
+    <include layout="@layout/fragment_main_park_list"/>
 </FrameLayout>

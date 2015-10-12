@@ -14,13 +14,13 @@ public class ServerRequest {
     private static final String TAG = "PARK_HTTPS";
 
     private static final String HTTP_ROOT = "https://139.196.26.139";
-    private static final String API_LOGIN = "/park/login";
-    private static final String API_QUERY = "/park/query";
-    private static final String API_CONFIRM = "/park/confirm";
-    private static final String API_ORDERS = "/park/orders";
-    private static final String API_CHECKQR = "/park/check_qr";
-    private static final String API_INFO = "/park/info";
-    private static final String API_UPDATE_INFO = "/park/update_info";
+    private static final String API_LOGIN = "/user/login";
+    private static final String API_QUERY_PARKS = "/user/query_parks";
+    private static final String API_BOOK = "/user/book";
+    private static final String API_ORDERS = "/user/orders";
+    private static final String API_GET_QRCODE = "/user/get_qrcode";
+    private static final String API_INFO = "/user/info";
+    private static final String API_UPDATE_INFO = "/user/update_info";
 
     private JSONObject jsonReq = new JSONObject();
     private JSONObject jsonRev = null;
@@ -31,6 +31,9 @@ public class ServerRequest {
         jsonReq.put(label, str);
     }
     public void setInt(String label, int i) throws JSONException {
+        jsonReq.put(label, i);
+    }
+    public void setDouble(String label, double i) throws JSONException {
         jsonReq.put(label, i);
     }
 
@@ -45,23 +48,17 @@ public class ServerRequest {
         return jsonRev.getString(JSONLabel.DATA);
     }
 
-    public String queryOrders() throws JSONException {
+    public String queryParks() throws JSONException {
         String url = Uri.parse(HTTP_ROOT).buildUpon()
-                .appendPath(API_QUERY)
+                .appendPath(API_QUERY_PARKS)
                 .appendQueryParameter(JSONLabel.SESSION, jsonReq.getString(JSONLabel.SESSION))
+                .appendQueryParameter(JSONLabel.RADIUS, jsonReq.getDouble(JSONLabel.RADIUS)+"")
+                .appendQueryParameter(JSONLabel.DEST_LNG, jsonReq.getDouble(JSONLabel.DEST_LNG)+"")
+                .appendQueryParameter(JSONLabel.DEST_LAT, jsonReq.getDouble(JSONLabel.DEST_LAT)+"")
                 .build().toString();
         return url;
     }
 
-    public String confirmOrder() throws JSONException {
-        String url = Uri.parse(HTTP_ROOT).buildUpon()
-                .appendPath(API_CONFIRM)
-                .appendQueryParameter(JSONLabel.SESSION, jsonReq.getString(JSONLabel.SESSION))
-                .appendQueryParameter(JSONLabel.USERID, jsonReq.getString(JSONLabel.USERID))
-                .appendQueryParameter(JSONLabel.ORDERID, jsonReq.getString(JSONLabel.ORDERID))
-                .build().toString();
-        return url;
-    }
     public String queryConfirmed() throws JSONException {
         String url = Uri.parse(HTTP_ROOT).buildUpon()
                 .appendPath(API_ORDERS)

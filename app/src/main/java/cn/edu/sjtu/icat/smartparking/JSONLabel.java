@@ -37,4 +37,8 @@ public class JSONLabel {
     public static final String USER_INFO = "userInfo";
     public static final String DISTANCE = "distance";
 
+    public static final String DEST_LNG = "dest_longitude";
+    public static final String DEST_LAT = "dest_latitude";
+    public static final String RADIUS = "radius";
+
 }
