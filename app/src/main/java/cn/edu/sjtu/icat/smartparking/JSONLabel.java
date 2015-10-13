@@ -32,6 +32,7 @@ public class JSONLabel {
 
     public static final String ID = "id";
     public static final String DONE_ORDERS = "done_orders";
+    public static final String NEG_ORDERS = "neg_orders";
     public static final String BANNED = "banned";
     public static final String MOBILE = "mobile";
     public static final String USER_INFO = "userInfo";

@@ -12,12 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
@@ -40,6 +43,10 @@ import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.MySSLSocketFactory;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -75,6 +82,39 @@ public class MainFragment extends Fragment {
     private LatLng mDestination;
 
     private ListView mParkList;
+
+    private ParkInfoAdapter mParkInfoAdapter;
+
+
+    private class ParkInfoAdapter extends ArrayAdapter<ParkInfo> {
+        public ParkInfoAdapter(ArrayList<ParkInfo> parks) {
+            super(getActivity(), 0, parks);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_park_info, null);
+
+            ParkInfo info = getItem(position);
+
+            TextView parkName = (TextView)convertView.findViewById(R.id.list_item_park_name);
+            parkName.setText(info.getName());
+            TextView parkAddress = (TextView)convertView.findViewById(R.id.list_item_park_address);
+            parkAddress.setText(info.getAddress());
+            TextView parkDistance = (TextView)convertView.findViewById(R.id.list_item_park_distance);
+            parkDistance.setText(MiscUtils.getDistanceDescription(info.getDistance()));
+
+            ImageView checkBox = (ImageView)convertView.findViewById(R.id.list_item_select_checkbox);
+            if(info.isSelected()) {
+                checkBox.setImageResource(R.drawable.selected_button240x240);
+            } else {
+                checkBox.setImageResource(R.drawable.unselected_button240x240);
+            }
+
+            return convertView;
+        }
+
+    }
 
 
     @Override
@@ -162,7 +202,21 @@ public class MainFragment extends Fragment {
                     client.get(serverRequest.queryParks(), new AsyncHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                            Log.d(TAG, "parks: "+ new String(responseBody));
+                            Log.d(TAG, "parks: " + new String(responseBody));
+                            try {
+                                JSONObject json = new JSONObject(new String(responseBody));
+                                if (json.getInt(JSONLabel.STATUS) == 0) {
+                                    ArrayList<ParkInfo> list = ParkListBuilder.fromString(json.getString(JSONLabel.DATA));
+                                    for (int i = 0; i < list.size(); i++) {
+                                        Log.d(TAG, "park " + i + ": " + list.get(i).getName());
+                                    }
+                                    mParkInfoAdapter = new ParkInfoAdapter(list);
+                                    mParkList.setAdapter(mParkInfoAdapter);
+                                }
+
+                            } catch (Exception e) {
+
+                            }
                         }
 
                         @Override
@@ -176,13 +230,19 @@ public class MainFragment extends Fragment {
             }
         });
 
-        final String[] strs = new String[] {
-                "first", "second", "third", "fourth", "fifth"
-        };
-
         mParkList = (ListView)v.findViewById(R.id.park_list);
-        mParkList.setAdapter(new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, strs));
+        mParkList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ParkInfo info = (ParkInfo)mParkList.getItemAtPosition(position);
+
+                info.setSelected(!info.isSelected());
+                mParkInfoAdapter.notifyDataSetChanged();
+            }
+        });
+//        mParkInfoAdapter = new P
+//        mParkList.setAdapter(new ArrayAdapter<String>(getActivity(),
+//                R.layout.list_item_park_info, strs));
 
         return v;
     }

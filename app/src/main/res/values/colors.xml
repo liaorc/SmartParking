@@ -6,11 +6,14 @@
 
 
     <color name="main_background">#293347</color>
-    <color name="main_background_apparent">#9a293347</color>
+    <color name="main_background_apparent">#b2292f47</color>
     <color name="secondary_background">#2c3d51</color>
     <color name="tab_color">#8a9faf</color>
     <color name="main_text_color">#8a9496</color>
     <color name="dark_color">#454457</color>
+
+    <color name="white">#ffffff</color>
+    <color name="sub_text_color">#a8afb1</color>
 
     <color name="actionbar_text">#424358</color>
     <color name="actionbar_background">#5eca94</color>

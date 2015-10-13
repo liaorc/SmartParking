@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:paddingTop="2dp"
+              android:paddingBottom="2dp"
+    >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_gravity="center"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="上海交通大学"
+                android:textColor="@color/white"
+                android:id="@+id/list_item_park_name"
+                android:textSize="18sp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:text="5.2公里"
+                android:textColor="@color/sub_text_color"
+                android:id="@+id/list_item_park_distance"
+
+                />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="闵行区东川路800号"
+            android:textColor="@color/sub_text_color"
+            android:id="@+id/list_item_park_address"
+            />
+        <TextView
+            android:id="@+id/TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="nothing"
+            />
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end|right"
+        >
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="议价0.00"
+                android:textColor="@color/white"
+                android:id="@+id/list_item_fee"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="收费5.00"
+                android:textColor="@color/white"
+                android:id="@+id/list_item_price"
+                />
+
+        </LinearLayout>
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="50dp"
+            android:paddingRight="12dp"
+            android:paddingLeft="12dp"
+            android:src="@drawable/unselected_button240x240"
+            android:id="@+id/list_item_select_checkbox"
+            />
+    </LinearLayout>
+
+
+</LinearLayout>
