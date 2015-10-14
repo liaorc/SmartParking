@@ -1,9 +1,13 @@
 package cn.edu.sjtu.icat.smartparking;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Layout;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -69,8 +74,10 @@ public class MainFragment extends Fragment {
 
     private ViewGroup mMenuView;
     private ViewGroup mSearchView;
+    private ViewGroup mParkListView;
     private MenuItem mMenuButton;
     private ImageButton mParkNowButton;
+    private Button mConfirmParkButton;
     private Animation mHide;
 
     private float mY1, mY2;
@@ -80,6 +87,7 @@ public class MainFragment extends Fragment {
     private Button mSearchLocationButton;
     private String mCity;
     private LatLng mDestination;
+    private TextView mParkListDestinationText;
 
     private ListView mParkList;
 
@@ -103,6 +111,11 @@ public class MainFragment extends Fragment {
             parkAddress.setText(info.getAddress());
             TextView parkDistance = (TextView)convertView.findViewById(R.id.list_item_park_distance);
             parkDistance.setText(MiscUtils.getDistanceDescription(info.getDistance()));
+
+            TextView fee = (TextView)convertView.findViewById(R.id.list_item_fee);
+            fee.setText("议价:" + info.getFee());
+            TextView price = (TextView)convertView.findViewById(R.id.list_item_price);
+            price.setText("收费:" + info.getPrice());
 
             ImageView checkBox = (ImageView)convertView.findViewById(R.id.list_item_select_checkbox);
             if(info.isSelected()) {
@@ -147,86 +160,67 @@ public class MainFragment extends Fragment {
         mSearchView = (ViewGroup)v.findViewById(R.id.search_layout);
         mSearchView.setVisibility(View.GONE);
 
+        mParkListView = (ViewGroup)v.findViewById(R.id.park_list_layout);
+        mParkListView.setVisibility(View.GONE);
+
         mSearchLocationEditText = (EditText)v.findViewById(R.id.search_locationEditText);
-        mSearchLocationButton = (Button)v.findViewById(R.id.search_locationButton);
-
-
-        mSearch = GeoCoder.newInstance();
-        OnGetGeoCoderResultListener listener = new OnGetGeoCoderResultListener() {
-            public void onGetGeoCodeResult(GeoCodeResult result) {
-                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
-                    //没有检索到结果
-                    if(result.error == SearchResult.ERRORNO.PERMISSION_UNFINISHED) {
-                        mSearch.geocode(new GeoCodeOption()
-                                .city("上海")
-                                .address("东川路800号"));
-                    }
-                    Log.d(TAG, "没有结果");
-                    Log.d(TAG, "error code: " + result.error);
-                    return;
+        mSearchLocationEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                if (s.length() > 0) {
+                    mSearchLocationButton.setTextColor(getResources().getColor(R.color.black));
+                } else {
+                    mSearchLocationButton.setTextColor(getResources().getColor(R.color.main_text_color));
                 }
-                //获取地理编码结果
-                mDestination = result.getLocation();
-                //addMarker(result.getLocation().latitude, result.getLocation().longitude);
-
             }
 
             @Override
-            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
-                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
-                    //没有找到检索结果
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() > 0) {
+                    mSearchLocationButton.setTextColor(getResources().getColor(R.color.black));
+                } else {
+                    mSearchLocationButton.setTextColor(getResources().getColor(R.color.main_text_color));
                 }
-                //获取反向地理编码结果
             }
-        };
-        mSearch.setOnGetGeoCodeResultListener(listener);
-        mSearch.geocode(new GeoCodeOption()
-                .city("上海市")
-                .address("上海市闵行区东川路800号"));
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.d(TAG, "After Text Change");
+            }
+        });
+        mSearchLocationEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                        && event.getAction() == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Enter!!!");
+                    searchLocation();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+
+        mSearchLocationButton = (Button)v.findViewById(R.id.search_locationButton);
+        mSearchLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mSearchLocationEditText.getWindowToken(), 0);
+                searchLocation();
+            }
+        });
+
 
         mParkNowButton = (ImageButton)v.findViewById(R.id.menu_park_nowButton);
         mParkNowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "日狗日狗日", Toast.LENGTH_SHORT).show();
+                //if(mSearchView.getVisibility() == View.GONE) {
+                    toggleSearchView();
+                //}
 
-                try {
-                    ServerRequest serverRequest = new ServerRequest();
-                    serverRequest.setString(JSONLabel.SESSION,
-                            CurrentUser.get(getActivity()).getSession());
-                    serverRequest.setDouble(JSONLabel.RADIUS, 2000);
-                    serverRequest.setDouble(JSONLabel.DEST_LNG, mDestination.longitude);
-                    serverRequest.setDouble(JSONLabel.DEST_LAT, mDestination.latitude);
-                    AsyncHttpClient client = new AsyncHttpClient();
-                    client.setSSLSocketFactory(MySSLSocketFactory.getFixedSocketFactory());
-                    client.get(serverRequest.queryParks(), new AsyncHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                            Log.d(TAG, "parks: " + new String(responseBody));
-                            try {
-                                JSONObject json = new JSONObject(new String(responseBody));
-                                if (json.getInt(JSONLabel.STATUS) == 0) {
-                                    ArrayList<ParkInfo> list = ParkListBuilder.fromString(json.getString(JSONLabel.DATA));
-                                    for (int i = 0; i < list.size(); i++) {
-                                        Log.d(TAG, "park " + i + ": " + list.get(i).getName());
-                                    }
-                                    mParkInfoAdapter = new ParkInfoAdapter(list);
-                                    mParkList.setAdapter(mParkInfoAdapter);
-                                }
-
-                            } catch (Exception e) {
-
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-
-                        }
-                    });
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
         });
 
@@ -238,8 +232,33 @@ public class MainFragment extends Fragment {
 
                 info.setSelected(!info.isSelected());
                 mParkInfoAdapter.notifyDataSetChanged();
+
+                for(int i=0; i<mParkList.getAdapter().getCount(); i++) {
+                    ParkInfo tmp = (ParkInfo)mParkList.getAdapter().getItem(i);
+                    if(tmp.isSelected()) {
+                        mConfirmParkButton.setTextColor(getResources().getColor(R.color.black));
+                        return;
+                    }
+                }
+                mConfirmParkButton.setTextColor(getResources().getColor(R.color.main_text_color));
             }
         });
+
+        mParkListDestinationText = (TextView)v.findViewById(R.id.search_locationTextView);
+
+        mConfirmParkButton = (Button)v.findViewById(R.id.confirm_parkButton);
+        mConfirmParkButton.setTextColor(getResources().getColor(R.color.main_text_color));
+        mConfirmParkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mConfirmParkButton.getCurrentTextColor() != getResources().getColor(R.color.black)) {
+                    return;
+                }
+                Log.d(TAG, "Send park request now");
+                toggleParkListView();
+            }
+        });
+
 //        mParkInfoAdapter = new P
 //        mParkList.setAdapter(new ArrayAdapter<String>(getActivity(),
 //                R.layout.list_item_park_info, strs));
@@ -256,6 +275,92 @@ public class MainFragment extends Fragment {
         option.setNeedDeviceDirect(true); // 返回的定位结果包含手机机头的方向
 
         mLocationClient.setLocOption(option);
+    }
+
+    private void searchLocation() {
+        Toast.makeText(getActivity(), "日狗日狗日", Toast.LENGTH_SHORT).show();
+        if(mSearch!=null)
+            mSearch.destroy();
+        mSearch = GeoCoder.newInstance();
+        OnGetGeoCoderResultListener listener = new OnGetGeoCoderResultListener() {
+            public void onGetGeoCodeResult(GeoCodeResult result) {
+                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+                    //没有检索到结果
+                    if(result.error == SearchResult.ERRORNO.PERMISSION_UNFINISHED) {
+                        mSearch.geocode(new GeoCodeOption()
+                                .city(mCity)
+                                .address(mSearchLocationEditText.getText().toString()));
+                    }
+                    Toast.makeText(getActivity(), "没有地理结果", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "error code: " + result.error);
+                    return;
+                }
+                //获取地理编码结果
+                mDestination = result.getLocation();
+                Log.d(TAG, "得到地址: " + mDestination.latitude+ "," + mDestination.longitude);
+                searchParks(mDestination);
+                //addMarker(result.getLocation().latitude, result.getLocation().longitude);
+
+            }
+
+            @Override
+            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+                if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+                    //没有找到检索结果
+                }
+                //获取反向地理编码结果
+            }
+        };
+        mSearch.setOnGetGeoCodeResultListener(listener);
+        mSearch.geocode(new GeoCodeOption()
+                .city(mCity)
+                .address(mSearchLocationEditText.getText().toString()));
+    }
+
+    private void searchParks(LatLng destination) {
+        try {
+            ServerRequest serverRequest = new ServerRequest();
+            serverRequest.setString(JSONLabel.SESSION,
+                    CurrentUser.get(getActivity()).getSession());
+            serverRequest.setDouble(JSONLabel.RADIUS, 5);
+            serverRequest.setDouble(JSONLabel.DEST_LNG, destination.longitude);
+            serverRequest.setDouble(JSONLabel.DEST_LAT, destination.latitude);
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.setSSLSocketFactory(MySSLSocketFactory.getFixedSocketFactory());
+            client.get(serverRequest.queryParks(), new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    Log.d(TAG, "parks: " + new String(responseBody));
+                    try {
+                        JSONObject json = new JSONObject(new String(responseBody));
+                        if (json.getInt(JSONLabel.STATUS) == 0) {
+                            ArrayList<ParkInfo> list = ParkListBuilder.fromString(json.getString(JSONLabel.DATA));
+                            for (int i = 0; i < list.size(); i++) {
+                                Log.d(TAG, "park " + i + ": " + list.get(i).getName());
+                            }
+                            if(list.size()==0) {
+                                Toast.makeText(getActivity(), "日狗日狗日，根本没有停车场", Toast.LENGTH_SHORT).show();
+                            } else {
+                                mParkInfoAdapter = new ParkInfoAdapter(list);
+                                mParkList.setAdapter(mParkInfoAdapter);
+                                mParkListDestinationText.setText(mSearchLocationEditText.getText().toString());
+                                toggleParkListView();
+                            }
+                        }
+
+                    } catch (Exception e) {
+
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Toast.makeText(getActivity(), "与服务器联系失败", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -275,7 +380,7 @@ public class MainFragment extends Fragment {
     private void toggleMenu() {
         Animation rotation;
         Animation menuAnime;
-        if(mMenuClosed) {
+        if(mMenuView.getVisibility() == View.GONE ) {
             rotation = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_180);
             menuAnime = AnimationUtils.loadAnimation(getActivity(), R.anim.show_menu);
             mMenuView.setVisibility(View.VISIBLE);
@@ -285,7 +390,6 @@ public class MainFragment extends Fragment {
             menuAnime.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
-                    //
                 }
 
                 @Override
@@ -295,14 +399,73 @@ public class MainFragment extends Fragment {
 
                 @Override
                 public void onAnimationRepeat(Animation animation) {
-                    //
                 }
             });
         }
-        mMenuClosed = !mMenuClosed;
         rotation.setFillAfter(true);
         mMenuButton.getActionView().startAnimation(rotation);
         mMenuView.startAnimation(menuAnime);
+    }
+    private void toggleSearchView() {
+        Animation anime;
+        if(mSearchView.getVisibility() == View.GONE ) {
+            //close park list
+            if(mParkListView.getVisibility() == View.VISIBLE) {
+                toggleParkListView();
+            }
+            anime = AnimationUtils.loadAnimation(getActivity(), R.anim.show_search_view);
+            mSearchView.setVisibility(View.VISIBLE);
+        } else {
+            anime = AnimationUtils.loadAnimation(getActivity(), R.anim.hide_search_view);
+            anime.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    mSearchView.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+        }
+        mSearchView.startAnimation(anime);
+    }
+
+    private void toggleParkListView() {
+        Animation anime;
+        if(mParkListView.getVisibility() == View.GONE ) {
+            //close search view
+            if(mSearchView.getVisibility() == View.VISIBLE) {
+                toggleSearchView();
+            }
+            if(mMenuView.getVisibility() == View.VISIBLE) {
+                toggleMenu();
+            }
+            anime = AnimationUtils.loadAnimation(getActivity(), R.anim.show_search_view);
+            mParkListView.setVisibility(View.VISIBLE);
+        } else {
+            anime = AnimationUtils.loadAnimation(getActivity(), R.anim.hide_search_view);
+            anime.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    mParkListView.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
+        }
+        anime.setDuration(400);
+        mParkListView.startAnimation(anime);
     }
 
     @Override

@@ -3,8 +3,10 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:id="@+id/park_list_layout"
     >
 
+    <!-- for empty space above the list-->
     <View
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
@@ -39,7 +41,7 @@
                 android:text="目的地："
                 android:paddingRight="4dp"/>
             <TextView
-                android:id="@+id/search_locationEditText"
+                android:id="@+id/search_locationTextView"
                 android:layout_weight="1"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -54,7 +56,7 @@
                 />
 
             <Button
-                android:id="@+id/search_locationButton"
+                android:id="@+id/confirm_parkButton"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="停车"

@@ -12,6 +12,7 @@ public class ParkInfo {
     private String mName;
     private int mDistance;
     private int mDoneOrders;
+    private int mFee;
     private int mBanned;
     private int mNegOrders;
     private double mLng;
@@ -40,6 +41,11 @@ public class ParkInfo {
         mAddress = json.getString(JSONLabel.ADDRESS);
         mPhone = json.getString(JSONLabel.PHONE);
         mPrice = json.getString(JSONLabel.PRICE);
+        mFee = json.getInt(JSONLabel.FEE);
+    }
+
+    public int getFee() {
+        return mFee;
     }
 
     public String getName() {

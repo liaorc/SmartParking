@@ -59,7 +59,7 @@ public class MiscUtils {
         if( dis <= 1000 ) {
             return dis+"米";
         } else {
-            double f = dis / 1000;
+            double f = 1.0* dis / 1000;
             return (new java.text.DecimalFormat("#.00").format(f)) + "公里";
         }
     }
