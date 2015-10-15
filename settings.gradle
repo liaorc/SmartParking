@@ -1,1 +1,1 @@
-include ':app',':app:libs:PullToRefresh'
+include ':app',':app:libs:PullToRefresh',':app:libs:HorizontalPicker'

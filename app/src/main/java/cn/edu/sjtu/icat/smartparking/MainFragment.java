@@ -2,6 +2,7 @@ package cn.edu.sjtu.icat.smartparking;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Layout;
@@ -77,6 +78,7 @@ public class MainFragment extends Fragment {
     private ViewGroup mParkListView;
     private MenuItem mMenuButton;
     private ImageButton mParkNowButton;
+    private ImageButton mParkAppointmentButton;
     private Button mConfirmParkButton;
     private Animation mHide;
 
@@ -206,7 +208,7 @@ public class MainFragment extends Fragment {
         mSearchLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(mSearchLocationEditText.getWindowToken(), 0);
                 searchLocation();
             }
@@ -221,6 +223,14 @@ public class MainFragment extends Fragment {
                     toggleSearchView();
                 //}
 
+            }
+        });
+        mParkAppointmentButton = (ImageButton)v.findViewById(R.id.menu_park_appointmentButton);
+        mParkAppointmentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getActivity(), AppointmentActivity.class);
+                startActivity(i);
             }
         });
 

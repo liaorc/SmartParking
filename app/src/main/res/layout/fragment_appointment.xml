@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -96,14 +97,30 @@
             android:textSize="23sp"
             />
 
-        <TextView
+        <!--<TextView-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="2"-->
+            <!--android:gravity="right"-->
+            <!--android:text="5元"-->
+            <!--android:textSize="21sp"-->
+            <!--/>-->
+
+        <com.wefika.horizontalpicker.HorizontalPicker
+            android:id="@+id/price_picker"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:gravity="right"
-            android:text="5元"
-            android:textSize="21sp"
-            />
+            android:textColor="@color/picker_text_color"
+            android:textSize="22sp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:ellipsize="none"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            app:values="@array/values"
+            app:dividerSize="10dp"
+            app:sideItems="2"/>
 
     </LinearLayout>
 
