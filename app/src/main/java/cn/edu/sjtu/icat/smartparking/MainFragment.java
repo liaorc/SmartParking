@@ -94,6 +94,7 @@ public class MainFragment extends Fragment {
     private ListView mParkList;
 
     private ParkInfoAdapter mParkInfoAdapter;
+    private ArrayList<ParkInfo> mParkInfos;
 
 
     private class ParkInfoAdapter extends ArrayAdapter<ParkInfo> {
@@ -230,6 +231,12 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getActivity(), AppointmentActivity.class);
+                Bundle arg = new Bundle();
+//                i.putParcelableArrayListExtra(AppointmentFragment.EXTRA_LIST, mParkInfos);
+//                i.putExtra(AppointmentFragment.EXTRA_ADDRESS, mSearchLocationEditText.getText().toString());
+                arg.putParcelableArrayList(AppointmentFragment.EXTRA_LIST, mParkInfos);
+                arg.putString(AppointmentFragment.EXTRA_ADDRESS, mSearchLocationEditText.getText().toString());
+                i.putExtras(arg);
                 startActivity(i);
             }
         });
@@ -344,14 +351,14 @@ public class MainFragment extends Fragment {
                     try {
                         JSONObject json = new JSONObject(new String(responseBody));
                         if (json.getInt(JSONLabel.STATUS) == 0) {
-                            ArrayList<ParkInfo> list = ParkListBuilder.fromString(json.getString(JSONLabel.DATA));
-                            for (int i = 0; i < list.size(); i++) {
-                                Log.d(TAG, "park " + i + ": " + list.get(i).getName());
+                            mParkInfos = ParkListBuilder.fromString(json.getString(JSONLabel.DATA));
+                            for (int i = 0; i < mParkInfos.size(); i++) {
+                                Log.d(TAG, "park " + i + ": " + mParkInfos.get(i).getName());
                             }
-                            if(list.size()==0) {
+                            if(mParkInfos.size()==0) {
                                 Toast.makeText(getActivity(), "日狗日狗日，根本没有停车场", Toast.LENGTH_SHORT).show();
                             } else {
-                                mParkInfoAdapter = new ParkInfoAdapter(list);
+                                mParkInfoAdapter = new ParkInfoAdapter(mParkInfos);
                                 mParkList.setAdapter(mParkInfoAdapter);
                                 mParkListDestinationText.setText(mSearchLocationEditText.getText().toString());
                                 toggleParkListView();
