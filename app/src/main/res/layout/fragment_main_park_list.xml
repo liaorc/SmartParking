@@ -59,7 +59,7 @@
                 android:id="@+id/confirm_parkButton"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="停车"
+                android:text="@string/park_now"
                 android:background="@drawable/stroke_box"
                 android:paddingLeft="4dp"
                 android:paddingRight="4dp"

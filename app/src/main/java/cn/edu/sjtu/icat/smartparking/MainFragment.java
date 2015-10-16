@@ -61,6 +61,12 @@ import cz.msebera.android.httpclient.Header;
  */
 public class MainFragment extends Fragment {
     private static final String TAG = "main_fragment";
+
+    private static final int STATE_PARK_NOW = 0;
+    private static final int STATE_PARK_APPOINTMENT = 1;
+
+    private int mParkState;
+
     // 百度地图控件
     private MapView mMapView = null;
     // 百度地图对象
@@ -96,6 +102,16 @@ public class MainFragment extends Fragment {
     private ParkInfoAdapter mParkInfoAdapter;
     private ArrayList<ParkInfo> mParkInfos;
 
+    private void setParkState(int state) {
+        mParkState = state;
+        if (state == STATE_PARK_NOW) {
+            mSearchLocationButton.setText(getResources().getText(R.string.park_now));
+            mConfirmParkButton.setText(getResources().getText(R.string.park_now));
+        }else {
+            mSearchLocationButton.setText(getResources().getText(R.string.park_appointment));
+            mConfirmParkButton.setText(getResources().getText(R.string.park_appointment));
+        }
+    }
 
     private class ParkInfoAdapter extends ArrayAdapter<ParkInfo> {
         public ParkInfoAdapter(ArrayList<ParkInfo> parks) {
@@ -220,9 +236,13 @@ public class MainFragment extends Fragment {
         mParkNowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //if(mSearchView.getVisibility() == View.GONE) {
+                if(mParkState == STATE_PARK_NOW) {
                     toggleSearchView();
-                //}
+                }else {
+                    if(mSearchView.getVisibility() == View.GONE)
+                        toggleSearchView();
+                }
+                setParkState(STATE_PARK_NOW);
 
             }
         });
@@ -230,14 +250,13 @@ public class MainFragment extends Fragment {
         mParkAppointmentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getActivity(), AppointmentActivity.class);
-                Bundle arg = new Bundle();
-//                i.putParcelableArrayListExtra(AppointmentFragment.EXTRA_LIST, mParkInfos);
-//                i.putExtra(AppointmentFragment.EXTRA_ADDRESS, mSearchLocationEditText.getText().toString());
-                arg.putParcelableArrayList(AppointmentFragment.EXTRA_LIST, mParkInfos);
-                arg.putString(AppointmentFragment.EXTRA_ADDRESS, mSearchLocationEditText.getText().toString());
-                i.putExtras(arg);
-                startActivity(i);
+                if(mParkState == STATE_PARK_APPOINTMENT) {
+                    toggleSearchView();
+                }else {
+                    if(mSearchView.getVisibility() == View.GONE)
+                        toggleSearchView();
+                }
+                setParkState(STATE_PARK_APPOINTMENT);
             }
         });
 
@@ -264,15 +283,18 @@ public class MainFragment extends Fragment {
         mParkListDestinationText = (TextView)v.findViewById(R.id.search_locationTextView);
 
         mConfirmParkButton = (Button)v.findViewById(R.id.confirm_parkButton);
-        mConfirmParkButton.setTextColor(getResources().getColor(R.color.main_text_color));
         mConfirmParkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mConfirmParkButton.getCurrentTextColor() != getResources().getColor(R.color.black)) {
                     return;
                 }
-                Log.d(TAG, "Send park request now");
                 toggleParkListView();
+                if(mParkState == STATE_PARK_NOW) {
+                    Log.d(TAG, "Send park request now");
+                } else {
+                    startAppointment();
+                }
             }
         });
 
@@ -282,6 +304,18 @@ public class MainFragment extends Fragment {
 
         return v;
     }
+
+    private void startAppointment() {
+        Intent i = new Intent(getActivity(), AppointmentActivity.class);
+        Bundle arg = new Bundle();
+//                i.putParcelableArrayListExtra(AppointmentFragment.EXTRA_LIST, mParkInfos);
+//                i.putExtra(AppointmentFragment.EXTRA_ADDRESS, mSearchLocationEditText.getText().toString());
+        arg.putParcelableArrayList(AppointmentFragment.EXTRA_LIST, mParkInfos);
+        arg.putString(AppointmentFragment.EXTRA_ADDRESS, mSearchLocationEditText.getText().toString());
+        i.putExtras(arg);
+        startActivity(i);
+    }
+
     private void setLocationOption() {
         LocationClientOption option = new LocationClientOption();
         option.setOpenGps(true); // 打开GPS
@@ -361,6 +395,7 @@ public class MainFragment extends Fragment {
                                 mParkInfoAdapter = new ParkInfoAdapter(mParkInfos);
                                 mParkList.setAdapter(mParkInfoAdapter);
                                 mParkListDestinationText.setText(mSearchLocationEditText.getText().toString());
+                                mConfirmParkButton.setTextColor(getResources().getColor(R.color.main_text_color));
                                 toggleParkListView();
                             }
                         }

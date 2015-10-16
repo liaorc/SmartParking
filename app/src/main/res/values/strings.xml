@@ -5,6 +5,9 @@
 
     <string name="actionbar_title">智慧停车</string>
 
+    <string name="park_now">现在停车</string>
+    <string name="park_appointment">预约停车</string>
+
 
     <string-array name="values">
         <item>0</item>

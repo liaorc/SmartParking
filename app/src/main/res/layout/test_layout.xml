@@ -6,7 +6,7 @@
               android:background="@color/silver"
     >
 
-    <include layout="@layout/fragment_appointment"/>
+    <include layout="@layout/header_view_fragment_appointment"/>
 
     <include layout="@layout/list_item_park_info_appointment"/>
 
