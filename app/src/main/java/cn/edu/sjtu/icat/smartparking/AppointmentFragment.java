@@ -4,8 +4,12 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -77,16 +81,41 @@ public class AppointmentFragment extends Fragment {
         mParkAddress = getArguments().getString(EXTRA_ADDRESS);
         mParkInfos = getArguments().getParcelableArrayList(EXTRA_LIST);
         setRetainInstance(true);
+        setHasOptionsMenu(true);
 
         for(int i=0; i<mParkInfos.size(); i++) {
             Log.d(TAG, "得到:" + mParkInfos.get(i).getName());
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_appointment_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (NavUtils.getParentActivityName(getActivity()) != null) {
+                    //NavUtils.navigateUpFromSameTask(getActivity());
+                    // TODO
+                }
+                return true;
+            default:
+                return true;
+        }
+        //return super.onOptionsItemSelected(item);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_appointment, null);
+
+        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+
         mListView = (ListView)v.findViewById(R.id.park_info_listView);
         View header = inflater.inflate(R.layout.header_view_fragment_appointment, mListView, false);
 
