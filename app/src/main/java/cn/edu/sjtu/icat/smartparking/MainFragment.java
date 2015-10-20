@@ -292,7 +292,8 @@ public class MainFragment extends Fragment {
         mOrderListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent i = new Intent(getActivity(), OrderListActivity.class);
+                startActivity(i);
             }
         });
 
@@ -453,6 +454,8 @@ public class MainFragment extends Fragment {
     private void toggleMenu() {
         Animation rotation;
         Animation menuAnime;
+//        if(mMenuView.getAnimation() != null)
+//            mMenuView.getAnimation().;
         if(mMenuView.getVisibility() == View.GONE ) {
             rotation = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_180);
             menuAnime = AnimationUtils.loadAnimation(getActivity(), R.anim.show_menu);

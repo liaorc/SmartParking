@@ -15,13 +15,18 @@ public class OrderList {
     private static final String TAG = "QUERY_LIST";
 
     private ArrayList<Order> mOrders;
+    private ArrayList<Order> mConfirmedOrders;
+    private ArrayList<Order> mFinishedOrders;
 
     private static OrderList sOrderList;
     private Context mAppContext;
 
+
     private OrderList (Context appContext) {
         mAppContext = appContext;
         mOrders = new ArrayList<Order>();
+        mConfirmedOrders = new ArrayList<Order>();
+        mFinishedOrders = new ArrayList<Order>();
     }
 
     public static OrderList get(Context c) {
@@ -31,6 +36,49 @@ public class OrderList {
         return sOrderList;
     }
 
+    public void updateConfirmedOrder(String data) {
+        mConfirmedOrders.clear();
+        try {
+            //task.queryOrders();
+            //int status = task.getStatusCode();
+            JSONArray array = (JSONArray) new JSONTokener(data).nextValue();
+            //task.getOrderList();
+            for ( int i=0 ; i<array.length() ; i++ ) {
+                Order order = new Order(array.getJSONObject(i));
+                mConfirmedOrders.add(order);
+                Log.d(TAG, array.getJSONObject(i).toString());
+                Log.d(TAG, "submit_time: "+order.getSubmitTime().toString() + ", " + order.getParkInfo().getName());
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Req Error" + e);
+            e.printStackTrace();
+        }
+        Log.d(TAG, "IDKW :" + mConfirmedOrders.size());
+    }
+
+    public ArrayList<OrderListElement> buildList() {
+        ArrayList<OrderListElement> list = new ArrayList<OrderListElement>();
+
+        OrderListElement o = new OrderListElement();
+        list.add(new OrderListElement(OrderListElement.TYPE_TAG_CONFIRMED));
+        o = new OrderListElement();
+        if ( mConfirmedOrders.size() == 0 ) {
+            list.add(new OrderListElement(OrderListElement.TYPE_EMPTY));
+        } else {
+            for (int i=0;i<mConfirmedOrders.size();i++){
+                list.add(new OrderListElement(OrderListElement.TYPE_ORDER_CONFIRMED));
+            }
+        }
+        list.add(new OrderListElement(OrderListElement.TYPE_TAG_FINISHED));
+        if ( mFinishedOrders.size() == 0 ) {
+            list.add(new OrderListElement(OrderListElement.TYPE_EMPTY));
+        } else {
+            for (int i=0;i<mFinishedOrders.size();i++){
+                list.add(new OrderListElement(OrderListElement.TYPE_ORDER_FINISHED));
+            }
+        }
+        return list;
+    }
 
     public void updateOrderList(String data) {
         clearOrder();
@@ -64,13 +112,6 @@ public class OrderList {
         return null;
     }
 
-    public void addOrder(Order o) {
-        mOrders.add(o);
-    }
-
-    public void deleteOrder(Order o) {
-        mOrders.remove(o);
-    }
 
     public void clearOrder() {
         mOrders.clear();

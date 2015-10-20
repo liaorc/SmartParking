@@ -38,7 +38,8 @@ public class ParkInfo implements Parcelable {
 
     public ParkInfo(JSONObject json) throws JSONException {
         mName = json.getString(JSONLabel.NAME);
-        mDistance = json.getInt(JSONLabel.DISTANCE);
+        if(json.has(JSONLabel.DISTANCE))
+            mDistance = json.getInt(JSONLabel.DISTANCE);
         mLng = json.getDouble(JSONLabel.LONGITUDE);
         mLat = json.getDouble(JSONLabel.LATITUDE);
         mDoneOrders = json.getInt(JSONLabel.DONE_ORDERS);

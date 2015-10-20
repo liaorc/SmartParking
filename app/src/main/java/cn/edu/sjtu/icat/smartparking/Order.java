@@ -31,7 +31,7 @@ public class Order {
         mFee = json.getInt(JSONLabel.FEE);
         if(json.has(JSONLabel.CONFIRMED_TIME))
             mConfirmedTime = new Date(json.getLong(JSONLabel.CONFIRMED_TIME)*1000);
-        if(json.has(JSONLabel.USER_INFO)) {
+        if(json.has(JSONLabel.PARK_INFO)) {
             //Log.d("Order_test", "user info:" + json.getString(JSONLabel.USER_INFO));
             mParkInfo = new ParkInfo(json.getJSONObject(JSONLabel.PARK_INFO));
         }
@@ -87,7 +87,7 @@ public class Order {
         mUserId = userId;
     }
 
-    public ParkInfo getUserInfo() {
+    public ParkInfo getParkInfo() {
         return mParkInfo;
     }
 

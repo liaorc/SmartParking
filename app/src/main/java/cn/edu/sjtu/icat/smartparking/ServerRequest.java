@@ -59,7 +59,7 @@ public class ServerRequest {
         return url;
     }
 
-    public String queryConfirmed() throws JSONException {
+    public String getOrders() throws JSONException {
         String url = Uri.parse(HTTP_ROOT).buildUpon()
                 .appendPath(API_ORDERS)
                 .appendQueryParameter(JSONLabel.SESSION, jsonReq.getString(JSONLabel.SESSION))
