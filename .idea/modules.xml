@@ -3,10 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/libs/HorizontalPicker/HorizontalPicker.iml" filepath="$PROJECT_DIR$/app/libs/HorizontalPicker/HorizontalPicker.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/libs/PullToRefresh/PullToRefresh.iml" filepath="$PROJECT_DIR$/app/libs/PullToRefresh/PullToRefresh.iml" />
       <module fileurl="file://$PROJECT_DIR$/SmartParking.iml" filepath="$PROJECT_DIR$/SmartParking.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/libs/libs.iml" filepath="$PROJECT_DIR$/app/libs/libs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/libs/pull-to-refresh/pull-to-refresh.iml" filepath="$PROJECT_DIR$/app/libs/pull-to-refresh/pull-to-refresh.iml" />
     </modules>
   </component>
 </project>

@@ -1,9 +1,11 @@
 package cn.edu.sjtu.icat.smartparking;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextWatcher;
@@ -65,6 +67,8 @@ public class MainFragment extends Fragment {
     private static final int STATE_PARK_NOW = 0;
     private static final int STATE_PARK_APPOINTMENT = 1;
 
+    private static final int REQUEST_APPOINTMENT = 0;
+
     private int mParkState;
 
     // 百度地图控件
@@ -85,8 +89,8 @@ public class MainFragment extends Fragment {
     private MenuItem mMenuButton;
     private ImageButton mParkNowButton;
     private ImageButton mParkAppointmentButton;
+    private ImageButton mOrderListButton;
     private Button mConfirmParkButton;
-    private Animation mHide;
 
     private float mY1, mY2;
     static final int MIN_DISTANCE = 150;
@@ -101,6 +105,8 @@ public class MainFragment extends Fragment {
 
     private ParkInfoAdapter mParkInfoAdapter;
     private ArrayList<ParkInfo> mParkInfos;
+
+    private int mResumeAnime = 0;
 
     private void setParkState(int state) {
         mParkState = state;
@@ -264,14 +270,14 @@ public class MainFragment extends Fragment {
         mParkList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ParkInfo info = (ParkInfo)mParkList.getItemAtPosition(position);
+                ParkInfo info = (ParkInfo) mParkList.getItemAtPosition(position);
 
                 info.setSelected(!info.isSelected());
                 mParkInfoAdapter.notifyDataSetChanged();
 
-                for(int i=0; i<mParkList.getAdapter().getCount(); i++) {
-                    ParkInfo tmp = (ParkInfo)mParkList.getAdapter().getItem(i);
-                    if(tmp.isSelected()) {
+                for (int i = 0; i < mParkList.getAdapter().getCount(); i++) {
+                    ParkInfo tmp = (ParkInfo) mParkList.getAdapter().getItem(i);
+                    if (tmp.isSelected()) {
                         mConfirmParkButton.setTextColor(getResources().getColor(R.color.black));
                         return;
                     }
@@ -282,6 +288,14 @@ public class MainFragment extends Fragment {
 
         mParkListDestinationText = (TextView)v.findViewById(R.id.search_locationTextView);
 
+        mOrderListButton = (ImageButton)v.findViewById(R.id.menu_order_list);
+        mOrderListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
         mConfirmParkButton = (Button)v.findViewById(R.id.confirm_parkButton);
         mConfirmParkButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -289,11 +303,17 @@ public class MainFragment extends Fragment {
                 if(mConfirmParkButton.getCurrentTextColor() != getResources().getColor(R.color.black)) {
                     return;
                 }
-                toggleParkListView();
                 if(mParkState == STATE_PARK_NOW) {
+                    toggleParkListView();
                     Log.d(TAG, "Send park request now");
                 } else {
-                    startAppointment();
+                    ArrayList<ParkInfo> selectedList = new ArrayList<ParkInfo>();
+                    for (int i = 0 ; i < mParkInfos.size() ; i++ ) {
+                        if(mParkInfos.get(i).isSelected()) {
+                            selectedList.add(mParkInfos.get(i));
+                        }
+                    }
+                    startAppointment(selectedList);
                 }
             }
         });
@@ -305,15 +325,16 @@ public class MainFragment extends Fragment {
         return v;
     }
 
-    private void startAppointment() {
+    private void startAppointment(ArrayList<ParkInfo> selectedList) {
         Intent i = new Intent(getActivity(), AppointmentActivity.class);
         Bundle arg = new Bundle();
 //                i.putParcelableArrayListExtra(AppointmentFragment.EXTRA_LIST, mParkInfos);
 //                i.putExtra(AppointmentFragment.EXTRA_ADDRESS, mSearchLocationEditText.getText().toString());
-        arg.putParcelableArrayList(AppointmentFragment.EXTRA_LIST, mParkInfos);
+        arg.putParcelableArrayList(AppointmentFragment.EXTRA_LIST, selectedList);
         arg.putString(AppointmentFragment.EXTRA_ADDRESS, mSearchLocationEditText.getText().toString());
         i.putExtras(arg);
-        startActivity(i);
+        //startActivity(i);
+        startActivityForResult(i, REQUEST_APPOINTMENT);
     }
 
     private void setLocationOption() {
@@ -526,6 +547,8 @@ public class MainFragment extends Fragment {
         mMapView.onResume();
     }
 
+
+
     @Override
     public void onPause() {
         super.onPause();
@@ -572,4 +595,30 @@ public class MainFragment extends Fragment {
         }
     };
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //if(resultCode!= Activity.RESULT_OK) return;
+        if(requestCode == REQUEST_APPOINTMENT) {
+            if(resultCode == Activity.RESULT_OK) {
+                getView().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                toggleParkListView();
+                            }
+                        }, 200);
+                    }
+                });
+                //mResumeAnime = 1;
+                //toggleParkListView();
+                Log.d(TAG, "OK get!!!");
+            } else {
+                Log.d(TAG, "Nothing get!!!");
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
 }

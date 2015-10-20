@@ -1,10 +1,13 @@
 package cn.edu.sjtu.icat.smartparking;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +20,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.wefika.horizontalpicker.HorizontalPicker;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,6 +34,8 @@ public class AppointmentFragment extends Fragment {
     private static final String TAG = "appointment_fragment";
     public static final String EXTRA_ADDRESS = "address";
     public static final String EXTRA_LIST = "list";
+    private static final int REQUEST_DATE_TIME = 0;
+    private static final int sPrice[]={0,5,10,15,25,50};
 
     private ArrayList<ParkInfo> mParkInfos;
     private String mParkAddress;
@@ -37,6 +45,9 @@ public class AppointmentFragment extends Fragment {
     private ParkInfoAdapter mAdapter;
 
     private TextView mAppointmentTimeButton;
+
+    private Date mDate;
+    private int mPrice;
 
 
     private class ParkInfoAdapter extends ArrayAdapter<ParkInfo> {
@@ -83,6 +94,8 @@ public class AppointmentFragment extends Fragment {
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
+        mDate = new Date();
+
         for(int i=0; i<mParkInfos.size(); i++) {
             Log.d(TAG, "得到:" + mParkInfos.get(i).getName());
         }
@@ -98,15 +111,21 @@ public class AppointmentFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (NavUtils.getParentActivityName(getActivity()) != null) {
-                    //NavUtils.navigateUpFromSameTask(getActivity());
-                    // TODO
-                }
+                sendResult(Activity.RESULT_CANCELED);
+                getActivity().finish();
+                return true;
+            case R.id.menu_confirm_appointment_button:
+                sendResult(Activity.RESULT_OK);
+                getActivity().finish();
                 return true;
             default:
-                return true;
+                return super.onOptionsItemSelected(item);
         }
-        //return super.onOptionsItemSelected(item);
+    }
+
+    private void setAppointmentInfo() {
+        mParkAddressTextView.setText(mParkAddress);
+        mAppointmentTimeButton.setText(DateFormat.format("MM月dd日 HH:mm", mDate));
     }
 
     @Nullable
@@ -129,15 +148,43 @@ public class AppointmentFragment extends Fragment {
             public void onClick(View v) {
                 FragmentManager fm = getActivity().getFragmentManager();
                 DateTimePickerFragment dialog = DateTimePickerFragment.newInstance(new Date());
-                dialog.setTargetFragment(AppointmentFragment.this, 1);
+                dialog.setTargetFragment(AppointmentFragment.this, REQUEST_DATE_TIME);
                 dialog.show(fm, "1");
             }
         });
 
 
         mParkAddressTextView = (TextView)header.findViewById(R.id.park_appointment_addressTextView);
-        mParkAddressTextView.setText(mParkAddress);
 
+        HorizontalPicker pricePicker = (HorizontalPicker)v.findViewById(R.id.price_picker);
+        pricePicker.setOnItemSelectedListener(new HorizontalPicker.OnItemSelected() {
+            @Override
+            public void onItemSelected(int index) {
+                mPrice = sPrice[index];
+                Toast.makeText(getActivity(), "Item selected is: " + mPrice, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        setAppointmentInfo();
         return v;
+    }
+
+    private void sendResult(int resultCode) {
+
+        Intent i = new Intent();
+        //i.putExtra(EXTRA_DATE, mDate);
+
+        getActivity().setResult(resultCode);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_DATE_TIME) {
+            if (resultCode == Activity.RESULT_OK) {
+                mDate =(Date)data.getSerializableExtra(DateTimePickerFragment.EXTRA_DATE);
+                setAppointmentInfo();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -24,6 +24,6 @@ dependencies {
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.android.support:support-v13:22.2.0'
-    compile project(':app:libs:PullToRefresh')
+    compile project(':app:libs:pull-to-refresh')
     compile project(':app:libs:HorizontalPicker')
 }

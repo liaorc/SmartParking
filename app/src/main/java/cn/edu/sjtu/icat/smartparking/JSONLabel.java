@@ -42,4 +42,6 @@ public class JSONLabel {
     public static final String DEST_LAT = "dest_latitude";
     public static final String RADIUS = "radius";
 
+    public static final String PARK_INFO = "parkinfo";
+
 }
