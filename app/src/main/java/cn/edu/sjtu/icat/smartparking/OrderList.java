@@ -56,8 +56,8 @@ public class OrderList {
         Log.d(TAG, "IDKW :" + mConfirmedOrders.size());
     }
 
-    public ArrayList<OrderListElement> buildList() {
-        ArrayList<OrderListElement> list = new ArrayList<OrderListElement>();
+    public void buildList(ArrayList<OrderListElement> list) {
+        list.clear();
 
         OrderListElement o = new OrderListElement();
         list.add(new OrderListElement(OrderListElement.TYPE_TAG_CONFIRMED));
@@ -66,7 +66,10 @@ public class OrderList {
             list.add(new OrderListElement(OrderListElement.TYPE_EMPTY));
         } else {
             for (int i=0;i<mConfirmedOrders.size();i++){
-                list.add(new OrderListElement(OrderListElement.TYPE_ORDER_CONFIRMED));
+                OrderListElement element = new OrderListElement(OrderListElement.TYPE_ORDER_CONFIRMED);
+                element.setOrder(mConfirmedOrders.get(i));
+                list.add(element);
+
             }
         }
         list.add(new OrderListElement(OrderListElement.TYPE_TAG_FINISHED));
@@ -77,7 +80,6 @@ public class OrderList {
                 list.add(new OrderListElement(OrderListElement.TYPE_ORDER_FINISHED));
             }
         }
-        return list;
     }
 
     public void updateOrderList(String data) {

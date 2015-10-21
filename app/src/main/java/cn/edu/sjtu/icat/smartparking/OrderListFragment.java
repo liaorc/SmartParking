@@ -7,8 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -16,11 +16,10 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.MySSLSocketFactory;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -41,9 +40,20 @@ public class OrderListFragment extends Fragment {
         }
 
         @Override
+        public boolean isEnabled(int position) {
+            OrderListElement element = getItem(position);
+            return element.getElementType() == OrderListElement.TYPE_ORDER_CONFIRMED;
+            //return super.isEnabled(position);
+        }
+
+
+
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             //convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_park_info, null);
 
+            if (convertView != null)
+                return convertView;
 
             OrderListElement element = getItem(position);
             Log.d(TAG, "pos " + position + "type" + element.getElementType());
@@ -52,13 +62,21 @@ public class OrderListFragment extends Fragment {
                     convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_empty, null);
                     break;
                 case OrderListElement.TYPE_TAG_CONFIRMED :
-                    convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_tag, null);
+                    convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_tag_confirmed, null);
                     break;
                 case OrderListElement.TYPE_TAG_FINISHED :
-                    convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_tag, null);
+                    convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_tag_finished, null);
                     break;
                 default:
                     convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_order, null);
+                    if ((position % 2) == 1){
+                        convertView.setBackgroundColor(getResources().getColor(R.color.secondary_background));
+                    }
+                    TextView timeTextView = (TextView)convertView.findViewById(R.id.confirmed_list_item_appointmentTimeTextView);
+                    timeTextView.setText(MiscUtils.getTimeDescription(element.getOrder().getSubmitTime(), new Date()));
+
+                    TextView parkNameTextView = (TextView)convertView.findViewById(R.id.confirmed_list_item_parkNameTextView);
+                    parkNameTextView.setText(element.getOrder().getParkInfo().getName());
                     break;
             }
             return convertView;
@@ -82,6 +100,16 @@ public class OrderListFragment extends Fragment {
         mOrderListAdapter = new OrderListAdapter(mOrderListElements);
         mListView.setAdapter(mOrderListAdapter);
 
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                position -= mListView.getRefreshableView().getHeaderViewsCount();
+                Log.d(TAG, "position: " + position);
+                OrderListElement element = mOrderListAdapter.getItem(position);
+                Log.d(TAG, "position: " + position + ", type: " + element.getElementType());
+            }
+        });
+
         try {
             ServerRequest serverRequest = new ServerRequest();
             serverRequest.setString(JSONLabel.SESSION,
@@ -99,10 +127,9 @@ public class OrderListFragment extends Fragment {
                         JSONObject json = new JSONObject(new String(responseBody));
                         if (json.getInt(JSONLabel.STATUS) == 0) {
                             OrderList.get(getActivity()).updateConfirmedOrder(json.getString(JSONLabel.DATA));
-                            mOrderListElements = OrderList.get(getActivity()).buildList();
-                            mListView.setAdapter(new OrderListAdapter(mOrderListElements));
+                            OrderList.get(getActivity()).buildList(mOrderListElements);
                             Log.d(TAG, "count: " + mOrderListElements.size());
-//                            mOrderListAdapter.notifyDataSetChanged();
+                            mOrderListAdapter.notifyDataSetChanged();
                         }
                     } catch (Exception e) {
 

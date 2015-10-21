@@ -1,15 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
     >
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="一个订单啊，什么鬼"
-        android:textSize="22sp"
-        android:textColor="@color/white"
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:padding="4dp"
+        android:id="@+id/confirmed_list_item_imageView"
+        android:src="@drawable/incomplete_order240x240"
         />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/confirmed_list_item_appointmentTimeLine"
+        android:orientation="horizontal"
+        android:layout_toLeftOf="@id/confirmed_list_item_imageView"
+        >
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:src="@drawable/order_time_icon240x240"
+            />
+        <LinearLayout
+            android:layout_width="1dp"
+            android:layout_height="20dp"
+            android:background="@color/actionbar_background"
+            android:layout_gravity="center"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="8dp"
+            />
+        <TextView
+            android:id="@+id/confirmed_list_item_appointmentTimeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:textColor="@color/actionbar_background"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:text="time_test_12:00"
+            />
+    </LinearLayout>
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_toLeftOf="@id/confirmed_list_item_imageView"
+        android:layout_below="@id/confirmed_list_item_appointmentTimeLine"
+        >
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_weight="1"
+            >
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:src="@drawable/location_icon150x240"
+                />
+            <LinearLayout
+                android:layout_width="1dp"
+                android:layout_height="20dp"
+                android:background="@color/actionbar_background"
+                android:layout_gravity="center"
+                android:layout_marginRight="8dp"
+                android:layout_marginLeft="8dp"
+                />
+            <TextView
+                android:id="@+id/confirmed_list_item_parkNameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:textColor="@color/actionbar_background"
+                android:textSize="16sp"
+                android:layout_gravity="center"
+                android:text="park_name_test"
+                />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>

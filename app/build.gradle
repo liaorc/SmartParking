@@ -26,4 +26,8 @@ dependencies {
     compile 'com.android.support:support-v13:22.2.0'
     compile project(':app:libs:pull-to-refresh')
     compile project(':app:libs:HorizontalPicker')
+
+    compile 'com.journeyapps:zxing-android-embedded:3.0.2@aar'
+    compile 'com.google.zxing:core:3.2.0'
+
 }

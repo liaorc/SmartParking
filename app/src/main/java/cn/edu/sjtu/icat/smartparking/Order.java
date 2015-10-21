@@ -21,6 +21,7 @@ public class Order {
     private int mFee;
     private ParkInfo mParkInfo;
     private int mDistance;
+    private String mQRCode;
 
     public Order(JSONObject json) throws JSONException {
         mOrderId = json.getInt(JSONLabel.ORDERID);
@@ -37,6 +38,8 @@ public class Order {
         }
         if(json.has(JSONLabel.DISTANCE))
             mDistance = json.getInt(JSONLabel.DISTANCE);
+        if(json.has(JSONLabel.QRCODE))
+            mQRCode = json.getString(JSONLabel.QRCODE);
     }
 
     public int getFee() {
