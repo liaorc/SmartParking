@@ -1,6 +1,7 @@
 package cn.edu.sjtu.icat.smartparking;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -107,6 +108,8 @@ public class OrderListFragment extends Fragment {
                 Log.d(TAG, "position: " + position);
                 OrderListElement element = mOrderListAdapter.getItem(position);
                 Log.d(TAG, "position: " + position + ", type: " + element.getElementType());
+                Intent i = new Intent(getActivity(), OrderDetailActivity.class);
+                startActivity(i);
             }
         });
 

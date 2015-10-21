@@ -1,6 +1,13 @@
 package cn.edu.sjtu.icat.smartparking;
 
+import android.graphics.Bitmap;
 import android.text.format.DateFormat;
+import android.util.Log;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -92,5 +99,27 @@ public class MiscUtils {
                 return getTimeDescription(d1, d2);
             }
         }
+    }
+
+    static public Bitmap str2Bitmap(String str, int w, int h) throws WriterException {
+        BitMatrix matrix = new MultiFormatWriter().encode(str, BarcodeFormat.QR_CODE, w, h);
+        int width = matrix.getWidth();
+        int height = matrix.getHeight();
+        Log.d("test??test", "h: " + height + ", w:" + width);
+        //二维矩阵转为一维像素数组,也就是一直横着排了
+        int[] pixels = new int[width * height];
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                if(matrix.get(x, y)){
+                    pixels[y * width + x] = 0xff000000;
+                }
+
+            }
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        //通过像素数组生成bitmap,具体参考api
+        bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bitmap;
     }
 }

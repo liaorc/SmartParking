@@ -44,6 +44,11 @@
                    android:value=".MainActivity">
             </meta-data>
         </activity>
+        <activity android:name=".OrderDetailActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                       android:value=".MainActivity">
+            </meta-data>
+        </activity>
     </application>
 
 </manifest>
