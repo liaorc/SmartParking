@@ -18,7 +18,7 @@ public class JSONLabel {
     public static final String APPOINTMENT_TIME = "appointment_time";
     public static final String USERID = "userid";
     public static final String FEE = "fee";
-    public static final String QRCODE = "qr";
+    public static final String QRCODE = "qrcode";
     public static final String CONFIRMED_TIME = "confirmed_time";
 
     public static final String TYPE = "type";
@@ -43,5 +43,8 @@ public class JSONLabel {
     public static final String RADIUS = "radius";
 
     public static final String PARK_INFO = "parkInfo";
+    public static final String PARK_LIST = "parklist";
+    public static final String USER_LNG = "user_longitude";
+    public static final String USER_LAT = "user_latitude";
 
 }

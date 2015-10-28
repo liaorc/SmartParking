@@ -75,6 +75,24 @@ public class ServerRequest {
                 .build().toString();
         return url;
     }
+
+    public String book() throws JSONException {
+        Uri.Builder builder = Uri.parse(HTTP_ROOT).buildUpon();
+        builder.appendPath(API_BOOK);
+        builder.appendQueryParameter(JSONLabel.SESSION, jsonReq.getString(JSONLabel.SESSION));
+        builder.appendQueryParameter(JSONLabel.USER_LAT, jsonReq.getDouble(JSONLabel.USER_LAT)+"");
+        builder.appendQueryParameter(JSONLabel.USER_LNG, jsonReq.getDouble(JSONLabel.USER_LNG)+"");
+        builder.appendQueryParameter(JSONLabel.PARK_LIST, jsonReq.getString(JSONLabel.PARK_LIST));
+        builder.appendQueryParameter(JSONLabel.TYPE, jsonReq.getInt(JSONLabel.TYPE)+"");
+        if(jsonReq.getInt(JSONLabel.TYPE) == Order.ORDER_TYPE_APPOINTMENT) {
+            builder.appendQueryParameter(JSONLabel.FEE, jsonReq.getInt(JSONLabel.FEE)+"");
+            builder.appendQueryParameter(JSONLabel.APPOINTMENT_TIME, jsonReq.getInt(JSONLabel.APPOINTMENT_TIME)+"");
+        }
+
+
+        return builder.build().toString();
+    }
+
     public String changeAddress() throws JSONException, UnsupportedEncodingException {
         String url = Uri.parse(HTTP_ROOT).buildUpon()
                 .appendPath(API_UPDATE_INFO)

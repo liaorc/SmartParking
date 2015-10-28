@@ -23,6 +23,7 @@ public class ParkInfo implements Parcelable {
     private String mAddress;
     private String mPrice;
     private String mPhone;
+    private int mID;
 
     private boolean mSelected = false;
 
@@ -48,6 +49,7 @@ public class ParkInfo implements Parcelable {
         mPhone = json.getString(JSONLabel.PHONE);
         mPrice = json.getString(JSONLabel.PRICE);
         mFee = json.getInt(JSONLabel.FEE);
+        mID = json.getInt(JSONLabel.ID);
     }
 
     @Override
@@ -63,6 +65,7 @@ public class ParkInfo implements Parcelable {
         dest.writeString(mAddress);
         dest.writeString(mPrice);
         dest.writeString(mPhone);
+        dest.writeInt(mID);
     }
 
     @Override
@@ -85,6 +88,7 @@ public class ParkInfo implements Parcelable {
             info.mAddress = source.readString();
             info.mPrice = source.readString();
             info.mPhone = source.readString();
+            info.mID = source.readInt();
             return info;
         }
 
@@ -94,6 +98,9 @@ public class ParkInfo implements Parcelable {
         }
     };
 
+    public int getID() {
+        return mID;
+    }
     public int getFee() {
         return mFee;
     }

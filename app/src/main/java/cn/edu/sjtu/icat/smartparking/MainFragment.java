@@ -48,6 +48,7 @@ import com.baidu.mapapi.search.geocode.GeoCodeResult;
 import com.baidu.mapapi.search.geocode.GeoCoder;
 import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
 import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.google.zxing.common.StringUtils;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.MySSLSocketFactory;
@@ -99,6 +100,7 @@ public class MainFragment extends Fragment {
     private Button mSearchLocationButton;
     private String mCity;
     private LatLng mDestination;
+    private LatLng mUserLocation;
     private TextView mParkListDestinationText;
 
     private ListView mParkList;
@@ -306,6 +308,7 @@ public class MainFragment extends Fragment {
                 }
                 if(mParkState == STATE_PARK_NOW) {
                     toggleParkListView();
+                    startParkNow();
                     Log.d(TAG, "Send park request now");
                 } else {
                     ArrayList<ParkInfo> selectedList = new ArrayList<ParkInfo>();
@@ -324,6 +327,58 @@ public class MainFragment extends Fragment {
 //                R.layout.list_item_park_info, strs));
 
         return v;
+    }
+
+    void startParkNow() {
+        try {
+            ServerRequest serverRequest = new ServerRequest();
+            serverRequest.setString(JSONLabel.SESSION,
+                    CurrentUser.get(getActivity()).getSession());
+            serverRequest.setDouble(JSONLabel.USER_LNG, mUserLocation.longitude);
+            serverRequest.setDouble(JSONLabel.USER_LAT, mUserLocation.latitude);
+            serverRequest.setDouble(JSONLabel.TYPE, Order.ORDER_TYPE_INSTANCE);
+            ArrayList<Integer> parks = new ArrayList<Integer>();
+            for(int i=0;i<mParkInfos.size();i++) {
+                if(mParkInfos.get(i).isSelected()) {
+                    parks.add(new Integer(mParkInfos.get(i).getID()));
+                }
+            }
+            //String j = StringU
+            String parksStr = new String(parks.get(0).toString());
+            for(int i=1;i<parks.size();i++) {
+                parksStr = parksStr + "," + parks.get(i).toString();
+            }
+
+            Log.d(TAG, "list: " + parksStr);
+            serverRequest.setString(JSONLabel.PARK_LIST, parksStr);
+            Log.d(TAG, "url: " + serverRequest.book());
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.setSSLSocketFactory(MySSLSocketFactory.getFixedSocketFactory());
+            client.get(serverRequest.book(), new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    Log.d(TAG, "parks: " + new String(responseBody));
+                    try {
+                        JSONObject json = new JSONObject(new String(responseBody));
+                        if (json.getInt(JSONLabel.STATUS) == 0) {
+                            Toast.makeText(getActivity(), "订单请求已发出", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity(), "订单请求失败", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } catch (Exception e) {
+
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Toast.makeText(getActivity(), "与服务器联系失败", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void startAppointment(ArrayList<ParkInfo> selectedList) {
@@ -582,6 +637,7 @@ public class MainFragment extends Fragment {
                     .direction(100).latitude(location.getLatitude())
                     .longitude(location.getLongitude()).build();
             mBaiduMap.setMyLocationData(locData);    //设置定位数据
+            mUserLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
 
             if (isFirstLoc) {

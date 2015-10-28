@@ -8,6 +8,6 @@ import android.app.Fragment;
 public class OrderDetailActivity extends SingleFragmentActivity {
     @Override
     protected Fragment createFragment() {
-        return new OrderDetailFragment();
+        return OrderDetailFragment.newInstance(getIntent().getExtras());
     }
 }

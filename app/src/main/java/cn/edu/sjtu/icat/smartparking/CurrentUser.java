@@ -23,7 +23,7 @@ public class CurrentUser {
 
     private String mUsername;
     private String mPassword;
-    private String mSession="6429066b90c5f756cf33aa660e957e2198827701";
+    private String mSession="3c20fb2717622b1f725f174efb6b9e27fbdc02d1";
     private double mLongitude;
     private double mLatitude;
     private String mDisplayName;

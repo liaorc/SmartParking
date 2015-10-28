@@ -108,8 +108,17 @@ public class OrderListFragment extends Fragment {
                 Log.d(TAG, "position: " + position);
                 OrderListElement element = mOrderListAdapter.getItem(position);
                 Log.d(TAG, "position: " + position + ", type: " + element.getElementType());
+
                 Intent i = new Intent(getActivity(), OrderDetailActivity.class);
+                Bundle arg = new Bundle();
+//                i.putParcelableArrayListExtra(AppointmentFragment.EXTRA_LIST, mParkInfos);
+//                i.putExtra(AppointmentFragment.EXTRA_ADDRESS, mSearchLocationEditText.getText().toString());
+                arg.putParcelable(OrderDetailFragment.EXTRA_ORDER, element.getOrder());
+                i.putExtras(arg);
                 startActivity(i);
+
+//                Intent i = new Intent(getActivity(), OrderDetailActivity.class);
+//                startActivity(i);
             }
         });
 
