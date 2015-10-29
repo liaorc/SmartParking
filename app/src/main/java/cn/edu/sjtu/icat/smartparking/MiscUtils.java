@@ -24,22 +24,22 @@ public class MiscUtils {
     }
 
 
-
-    static public CharSequence getTimeDescription(Date d) {
-        Calendar c1 = Calendar.getInstance();
-        Calendar c2 = Calendar.getInstance();
-        c1.setTime(d);
-        if(isSameDay(c1, c2)) {
-            return DateFormat.format("今天HH:mm", d);
-        } else {
-            c2.add(Calendar.DATE, -1);
-            if(isSameDay(c1, c2)) {
-                return DateFormat.format("昨天HH:mm", d);
-            } else {
-                return DateFormat.format("MM月dd日", d);
-            }
-        }
-    }
+//
+//    static public CharSequence getTimeDescription(Date d) {
+//        Calendar c1 = Calendar.getInstance();
+//        Calendar c2 = Calendar.getInstance();
+//        c1.setTime(d);
+//        if(isSameDay(c1, c2)) {
+//            return DateFormat.format("今天HH:mm", d);
+//        } else {
+//            c2.add(Calendar.DATE, -1);
+//            if(isSameDay(c1, c2)) {
+//                return DateFormat.format("昨天HH:mm", d);
+//            } else {
+//                return DateFormat.format("MM月dd日", d);
+//            }
+//        }
+//    }
 
     static public String getTimeDescription(Date d1, Date d2) {
         Calendar c1 = Calendar.getInstance();
@@ -47,15 +47,18 @@ public class MiscUtils {
         c1.setTime(d1);
         c2.setTime(d2);
         if(isSameDay(c1, c2)) {
-            return "今日"+d1.getHours()+":"+d1.getMinutes();
+            //return "今日"+d1.getHours()+":"+d1.getMinutes();
+            return DateFormat.format("今日HH:mm", d1).toString();
         } else {
             c2.add(Calendar.DATE, -1);
             if(isSameDay(c1, c2)) {
-                return "昨日"+d1.getHours()+":"+d1.getMinutes();
+                //return "昨日"+d1.getHours()+":"+d1.getMinutes();
+                return DateFormat.format("昨日HH:mm", d1).toString();
             } else {
                 c2.add(Calendar.DATE, 2);
                 if(isSameDay(c1, c2)) {
-                    return "明日"+d1.getHours()+":"+d1.getMinutes();
+                    //return "明日"+d1.getHours()+":"+d1.getMinutes();
+                    return DateFormat.format("明日HH:mm", d1).toString();
                 }else {
                     return DateFormat.format("MM月dd日", d1).toString();
                 }
